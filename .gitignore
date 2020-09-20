@@ -3,3 +3,4 @@ application/app/__pycache__
 *.tfstate
 plan
 *.backup
+terraform/gcp/key.json
