@@ -4,3 +4,7 @@ application/app/__pycache__
 plan
 *.backup
 terraform/gcp/key.json
+terraform/.terraform
+terraform/azure/.terraform
+terraform/gcp/.terraform
+terraform/aws/.terraform
