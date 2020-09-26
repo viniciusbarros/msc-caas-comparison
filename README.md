@@ -8,10 +8,9 @@ The goal is to have this repository publicly available once the project is finis
 
 ## The application
 A Docker application was created to be deployed and utilised in each of the studied CSP.
-It consists of a Flask (Python3 web app), served via a Nginx webserver, based on [tiangolo/uwsgi-nginx-flask](https://github.com/tiangolo/uwsgi-nginx-flask-docker)
+It consists of a Flask (Python3 web app), served via a Waitress webserver, which is recommended by [Flask](https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/#run-with-a-production-server)
 
-
-The application is in this repository, but the Docker image is being hosted in Dockerhub: [viniciusbarros/msc-performance-web-app](https://hub.docker.com/repository/registry-1.docker.io/viniciusbarros/msc-performance-web-app)
+The application is in this repository, but the Docker image built from the Dockerfil is being hosted in Dockerhub: [viniciusbarros/msc-performance-web-app](https://hub.docker.com/repository/registry-1.docker.io/viniciusbarros/msc-performance-web-app)
 
 
 There are two main functionalities:
@@ -21,7 +20,7 @@ A GET HTTP request to **/** in the application, you'll answer:
 ```json
 {
 "data": "Hello World MSC - Container as a Service Comparison",
-"duration": 9.298324584960938e-06
+"duration": 0.0000074
 }
 ```
 
@@ -31,9 +30,9 @@ When you access the path **/cpu/factorial/<NUMBER>**, the application will calcu
 ```json
 {
 "data": "Factorial of 10 is: 3628800",
-"duration": 1.9073486328125e-05,
-"end": 1599158814.0735264,
-"start": 1599158814.0735073
+"duration": 0.0000155,
+"end": 1601134255.7055125,
+"start": 1601134255.705497
 }
 ```
 
