@@ -8,3 +8,4 @@ terraform/.terraform
 terraform/azure/.terraform
 terraform/gcp/.terraform
 terraform/aws/.terraform
+execution.log
