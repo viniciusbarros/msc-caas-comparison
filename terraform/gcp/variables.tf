@@ -5,12 +5,12 @@ variable "project" {
 
 variable "region" {
   description = "Region to be used"
-  default     = "europe-north1"
+  default     = "us-east4"
 }
 
 variable "zone" {
   description = "Zone within region to deploy"
-  default     = "europe-north1-a"
+  default     = "us-east4-a"
 }
 
 variable cpu {
