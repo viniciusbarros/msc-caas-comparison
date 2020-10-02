@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_container_group" "example" {
-  name                = "msc-container"
+  name                = "msc-caas-container"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   ip_address_type     = "public"
@@ -20,7 +20,7 @@ resource "azurerm_container_group" "example" {
   dns_name_label      = var.dns
 
   container {
-    name   = "hw"
+    name   = "msc-caas-comparison-container"
     image  = var.docker_image
     cpu    = var.cpu
     memory = var.memory
@@ -33,4 +33,9 @@ resource "azurerm_container_group" "example" {
   tags = {
     environment = "testing"
   }
+}
+
+output "service_url" {
+  value       = azurerm_container_group.example.fqdn
+  description = "URL to access the app"
 }

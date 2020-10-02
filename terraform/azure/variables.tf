@@ -20,7 +20,7 @@ variable "dns" {
 
 variable "location" {
   description = "The Azure location where all resources in this example should be created"
-  default     = "North Europe"
+  default     = "East US"
 }
 
 variable docker_image {
