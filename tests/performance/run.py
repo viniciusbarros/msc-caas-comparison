@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from datetime import datetime
 import time
@@ -16,22 +17,23 @@ logging.basicConfig(
 
 
 class Runner:
+    TIME_FORMAT = "%Y_%m_%d_%H_%M_%S"
     CASES = [
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='' hello-world.js --insecure-skip-tls-verify --summary-export=metrics/{now}_hello_world_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='' hello-world.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_hello_world_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 0.00001
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/10' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_10_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/10' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_10_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 0.0005
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/1000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_1000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/1000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_1000_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 0.05
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/10000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_10000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/10000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_10000_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 0.5
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/32000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_32000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/32000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_32000_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 1s
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/43000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_43000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/43000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_43000_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 2s
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/50000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_50000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/50000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_50000_{hosting}_{cpu}_cpu_{memory}_memory.json",
         # 3s
-        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/60000' cpu.js --insecure-skip-tls-verify --summary-export=metrics/{now}_factorial_60000_{hosting}_{cpu}_cpu_{memory}_memory.json",
+        "k6 run -e DOMAIN='{domain}' -e ENDPOINT='cpu/factorial/60000' cpu.js --insecure-skip-tls-verify --address localhost:0 --summary-export=metrics/{now}_factorial_60000_{hosting}_{cpu}_cpu_{memory}_memory.json",
     ]
     SCENARIOS = [
         {
@@ -138,10 +140,16 @@ class Runner:
         logging.info(
             f"We have {len(self.SCENARIOS)} scenario(s) to run. {len(self.CASES)} cases each.")
 
-    def execute_all(self):
+    def execute(self, csp_filter):
         logging.info("--------Starting Script Runner--------")
+
         for scenario in self.SCENARIOS:
             hosting = scenario.get('hosting')
+            # Skipping execution
+            if csp_filter not in ['all', hosting]:
+                logging.info(f"Skipping execution of {hosting}")
+                continue
+
             if hosting == 'docker':
                 self.run_docker(scenario)
             elif hosting == 'gcp':
@@ -152,6 +160,7 @@ class Runner:
                 self.run_azure(scenario)
             else:
                 logging.warning(f'Hosting {hosting} is not yet supported')
+
         logging.info("--------Ending Script Runner--------")
 
     def run_command(self, command):
@@ -182,7 +191,7 @@ class Runner:
             # Running Test Cases
             for case in self.CASES:
                 run_cmd = case.format(cpu=cpu, memory=memory, hosting=scenario.get(
-                    'hosting'), domain=scenario.get('domain'), now=datetime.now().strftime("%Y_%m_%d_%H%M%S"))
+                    'hosting'), domain=scenario.get('domain'), now=datetime.now().strftime(self.TIME_FORMAT))
                 self.run_command(run_cmd)
                 # Sleeping between
                 time.sleep(self.sleep_time_between_cases)
@@ -216,7 +225,7 @@ class Runner:
             # Running Test Cases
             for case in self.CASES:
                 run_cmd = case.format(cpu=cpu, memory=memory, hosting=scenario.get(
-                    'hosting'), domain=url, now=datetime.now().strftime("%Y_%m_%d_%H%M%S"))
+                    'hosting'), domain=url, now=datetime.now().strftime(self.TIME_FORMAT))
                 self.run_command(run_cmd)
                 # Sleeping between
                 time.sleep(self.sleep_time_between_cases)
@@ -257,7 +266,7 @@ class Runner:
             # Running Test Cases
             for case in self.CASES:
                 run_cmd = case.format(cpu=cpu, memory=memory, hosting=scenario.get(
-                    'hosting'), domain=url, now=datetime.now().strftime("%Y_%m_%d_%H%M%S"))
+                    'hosting'), domain=url, now=datetime.now().strftime(self.TIME_FORMAT))
                 self.run_command(run_cmd)
                 # Sleeping between
                 time.sleep(self.sleep_time_between_cases)
@@ -296,7 +305,7 @@ class Runner:
             # Running Test Cases
             for case in self.CASES:
                 run_cmd = case.format(cpu=cpu, memory=memory, hosting=scenario.get(
-                    'hosting'), domain=url, now=datetime.now().strftime("%Y_%m_%d_%H%M%S"))
+                    'hosting'), domain=url, now=datetime.now().strftime(self.TIME_FORMAT))
                 self.run_command(run_cmd)
                 # Sleeping between
                 time.sleep(self.sleep_time_between_cases)
@@ -308,4 +317,5 @@ class Runner:
 
 
 runner = Runner()
-runner.execute_all()
+csp_filter = sys.argv[1] if len(sys.argv) > 1 else 'all'
+runner.execute(csp_filter)
