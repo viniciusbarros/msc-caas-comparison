@@ -37,13 +37,28 @@ class MetricReader:
 
         files = glob.glob("metrics/*.json")
 
+        max_per_insert = 10
+        count = 0
+
         for _, filename in enumerate(files):
             data_filename = self.extract_data_from_filename(filename)
             data_content = self.extract_data_from_content(filename)
             full_data = {**data_filename, **data_content}
-            data.append(tuple(full_data.values()))
+            new = tuple(full_data.values())
+            if len(new) == 77:
+                count += 1
+                data.append(new)
+            else:
+                print(f"Problem with file {filename}")
 
-        self.save_in_db(data)
+            
+            if max_per_insert == count:
+                self.save_in_db(data)
+                data = []
+                
+        if data != []:
+            self.save_in_db(data)
+
         # Moving read files
         for _, filename in enumerate(files):
             os.rename(filename, filename.replace('metrics/', 'saved_metrics/'))
@@ -67,17 +82,22 @@ class MetricReader:
 
     def extract_data_from_content(self, filename):
 
-        f = open(filename, "r")
-        raw = json.loads(f.read())
+        try:
+            f = open(filename, "r")
+            raw = json.loads(f.read())
 
-        data = {}
-        for prefix in raw['metrics']:
+            data = {}
+            for prefix in raw['metrics']:
 
-            for metric, val in raw['metrics'][prefix].items():
-                metric = metric.replace('(', '').replace(')', '')
-                data[f"{prefix}_{metric}"] = val
+                for metric, val in raw['metrics'][prefix].items():
+                    metric = metric.replace('(', '').replace(')', '')
+                    data[f"{prefix}_{metric}"] = val
 
-        return data
+            return data
+        except Exception as e:
+            logging.error(f"Failed to read file {filename}")
+            logging.error(e)
+            raise e
 
     def save_in_db(self, data):
         self.db_c.executemany(

@@ -254,7 +254,7 @@ class Runner:
             self.run_command(start_cmd)
 
             logging.info(
-                'Sleeping for 90 sec wainting for network interface & service to be ready')
+                'Sleeping for 90 sec waiting for network interface & service to be ready')
             time.sleep(90)
             # Getting instance IP
             # Note: Unfortunatelly  ECS/Terraform dont provide an easy way to get the IP or domain
@@ -299,7 +299,7 @@ class Runner:
             url = 'http://' + domain
 
             logging.info(
-                'Sleeping for 60 sec wainting for service to be ready')
+                'Sleeping for 60 sec waiting for service to be ready')
             time.sleep(60)
 
             # Running Test Cases
