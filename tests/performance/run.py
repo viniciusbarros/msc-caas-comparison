@@ -318,4 +318,19 @@ class Runner:
 
 runner = Runner()
 csp_filter = sys.argv[1] if len(sys.argv) > 1 else 'all'
-runner.execute(csp_filter)
+repeat = sys.argv[2] if len(sys.argv) > 2 else False
+minutes_to_sleep = 60
+
+if repeat:
+    while True:
+        logging.info("Let's do 1 more execution!")
+        runner.execute(csp_filter)
+        sleep_time_remaining = minutes_to_sleep
+        while (sleep_time_remaining > 0):
+            logging.info(f"Sleeping for {sleep_time_remaining} minutes...")
+            time.sleep(60)
+            sleep_time_remaining -= 1
+
+else:
+    logging.info("Running only once.")
+    runner.execute(csp_filter)

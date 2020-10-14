@@ -109,4 +109,13 @@ class MetricReader:
 
 
 runner = MetricReader()
-runner.read_all()
+sleep = 30
+
+while True:
+    logging.info(f"Collecting Metrics...")
+    runner.read_all()
+    sleep_time_remaining = sleep
+    while (sleep_time_remaining > 0):
+        logging.info(f"Sleeping for {sleep_time_remaining} minutes...")
+        time.sleep(60)
+        sleep_time_remaining -= 1
