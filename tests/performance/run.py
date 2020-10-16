@@ -323,13 +323,19 @@ minutes_to_sleep = 60
 
 if repeat:
     while True:
+        
+        current_minute = int(time.strftime('%M'))
+        while (current_minute != 0):
+            logging.info(f"Time remaining until next execution {60-current_minute} minute(s)...")
+            time.sleep(60)
+            current_minute = int(time.strftime('%M'))
+
         logging.info("Let's do 1 more execution!")
         runner.execute(csp_filter)
-        sleep_time_remaining = minutes_to_sleep
-        while (sleep_time_remaining > 0):
-            logging.info(f"Sleeping for {sleep_time_remaining} minutes...")
-            time.sleep(60)
-            sleep_time_remaining -= 1
+
+        
+        
+        
 
 else:
     logging.info("Running only once.")
