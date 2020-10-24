@@ -1,5 +1,8 @@
 # msc-caas-comparison
 
+![Docker Pulls](https://img.shields.io/docker/pulls/viniciusbarros/msc-performance-web-app)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/viniciusbarros/msc-performance-web-app)
+
 The goal of this project is to help organising the development of the MSc research that compares "Container as a Service" solutions available in public Cloud Service Providers (CSP).
 
 This project will also host the source code that will be used to perform the tests and anylises.
@@ -11,7 +14,6 @@ A Docker application was created to be deployed and utilised in each of the stud
 It consists of a Flask (Python3 web app), served via a Waitress webserver, which is recommended by [Flask](https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/#run-with-a-production-server)
 
 The application is in this repository, but the Docker image built from the Dockerfil is being hosted in Dockerhub: [viniciusbarros/msc-performance-web-app](https://hub.docker.com/repository/registry-1.docker.io/viniciusbarros/msc-performance-web-app)
-
 
 There are two main functionalities:
 ### Hello World
