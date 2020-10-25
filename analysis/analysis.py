@@ -6,6 +6,8 @@ from io import BytesIO
 import numpy as np
 import MySQLdb
 from matplotlib.figure import Figure
+from pricing import Pricing
+from performance import Performance
 
 app = Flask(__name__)
 
@@ -20,16 +22,13 @@ class Analysis:
         self.db = None
         self.db_c = None
         self.connect_db()
+        
         # Analysis attributes
         self.report = request.args.get('report', 'home')
-        self.cpu = request.args.get('cpu', None)
-        self.memory = request.args.get('memory', None)
-        self.factorial = request.args.get('factorial', None)
-        self.type_of_app = request.args.get('app', None)
 
-        self.cpu_mem_comb = [(1, 2), (1, 3), (1, 4), (2, 4)]
-        self.apps = ['hello-world', 'factorial']
-        self.factorials = [10, 1000, 10000, 32000, 43000, 50000, 60000]
+        #objects
+        self.performance = Performance(self.db_c, self.FUNCTION_NAME)
+        self.pricing = Pricing(self.db_c, self.FUNCTION_NAME)
 
     def connect_db(self):
         # DB Connection
@@ -43,87 +42,33 @@ class Analysis:
         if self.report == 'home':
             return self.home()
         elif self.report == 'performance':
-            return self.performance()
+            return self.performance_analysis()
+        elif self.report == 'pricing':
+            return self.pricing_analysis()
 
         return f"Oops... I didn't find anything here... <a href='/{self.FUNCTION_NAME}'>Go back to home</a>?"
 
     def home(self):
-        page = "<h1>Reports</h1>"
-
-        for app in self.apps:
-            page = page + f"<h2>App {app}</h2> <ul>"
-
-            if app == 'hello-world':
-                for cpu, mem in self.cpu_mem_comb:
-                    page = page + \
-                        f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app=hello&cpu={cpu}&memory={mem}">Performance Hello World - {cpu} CPU & {mem} Memory</a></li>'
-            elif app == 'factorial':
-                for cpu, mem in self.cpu_mem_comb:
-                    for factorial_param in self.factorials:
-                        page = page + \
-                            f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app={app}&cpu={cpu}&memory={mem}&factorial={factorial_param}">Performance Factorial {factorial_param} - {cpu} CPU & {mem} Memory</a></li>'
-
-            page = page + '</ul>'
-        return page
-
-    def performance(self):
-        query = f"""SELECT
-                    csp,
-                    min(app_execution_time_min) as  app_execution_time_min,
-                    avg(app_execution_time_avg) as  app_execution_time_avg,
-                    max(app_execution_time_max) as  app_execution_time_max
-                    FROM metrics
-                    WHERE
-                    memory = {self.memory} AND
-                    cpu = {self.cpu} AND
-                    type = '{self.type_of_app}'
-                    """
-        if self.type_of_app == 'factorial':
-            query = query + f" AND factorial = {self.factorial}"
-
-        query = query + """
-                    GROUP BY csp
-                    ORDER BY csp
-                """
-
+        html = "<h1>Reports</h1>"
+        html += self.performance.get_reports_links()
+        html += self.pricing.get_reports_links()
         
-        self.db_c.execute(query)
-        data = self.db_c.fetchall()
-        
-        labels = []
-        min_data = []
-        avg_data = []
-        max_data = []
+        return html
 
-        for item in data:
-            labels.append(item.get('csp'))
-            min_data.append(item.get('app_execution_time_min'))
-            avg_data.append(item.get('app_execution_time_avg'))
-            max_data.append(item.get('app_execution_time_max'))
+    def performance_analysis(self):
+        cpu = request.args.get('cpu', None)
+        memory = request.args.get('memory', None)
+        factorial = request.args.get('factorial', None)
+        type_of_app = request.args.get('app', None)
 
-        # return str(data)
-
-        x = np.arange(len(labels))  # the label locations
-        width = 0.20  # the width of the bars
-        fig = Figure()
-        ax = fig.subplots()
-        rect_min = ax.bar(x - width, min_data, width, label='Min')
-        rect_avg = ax.bar(x, avg_data, width, label='Avg')
-        rect_max = ax.bar(x + width, max_data, width, label='Max')
-
-        # # Add some text for labels, title and custom x-axis tick labels, etc.
-        ax.set_ylabel('millisecond (ms)')
-        ax.set_title(f'Mininimum, Average and Maximum response times for {self.type_of_app} {self.factorial}')
-        ax.set_xticks(x)
-        ax.set_xticklabels(labels)
-        ax.legend()
-        # self.label_bars(rects1, ax)
-        # self.label_bars(rects2, ax)
-
-        buf = BytesIO()
-        fig.savefig(buf, format="png")
-        img_base64 = base64.b64encode(buf.getbuffer()).decode("ascii")
-        return f"<img src='data:image/png;base64,{img_base64}'/>"
+        return self.performance.get_diagram(type_of_app, cpu, memory, factorial)
+    
+    def pricing_analysis(self):
+        pricing_scenario = request.args.get('scenario', None)
+        if pricing_scenario is not None:
+            return self.pricing.get_diagram(pricing_scenario)
+        else:
+            return self.pricing.get_crossing_diagram()
 
 
 @app.route("/")
