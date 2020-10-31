@@ -12,3 +12,4 @@ execution.log
 tests/performance/metrics
 tests/performance/__pycache__
 tests/performance/saved_metrics
+analysis/__pycache__

@@ -253,15 +253,22 @@ class Runner:
                 f"Creating AWS ECS Fargate w/ CPU: {cpu} and Memory: {memory}")
             self.run_command(start_cmd)
 
-            logging.info(
-                'Sleeping for 90 sec waiting for network interface & service to be ready')
-            time.sleep(90)
+            has_dns = False
+            while has_dns != True:
+                try:
+                    networks = json.loads(self.run_command(
+                        scenario.get('get_networks')))
+                    url = 'http://' + \
+                        networks['NetworkInterfaces'][0]['Association']['PublicDnsName']
+                    has_dns = True
+
+                except:
+                    logging.warning(
+                        'DNS Still not available... Sleeping for 90 seconds')
+                    time.sleep(90)
+
             # Getting instance IP
             # Note: Unfortunatelly  ECS/Terraform dont provide an easy way to get the IP or domain
-            networks = json.loads(self.run_command(
-                scenario.get('get_networks')))
-            url = 'http://' + \
-                networks['NetworkInterfaces'][0]['Association']['PublicDnsName']
 
             # Running Test Cases
             for case in self.CASES:
@@ -323,19 +330,17 @@ minutes_to_sleep = 60
 
 if repeat:
     while True:
-        
+
         current_minute = int(time.strftime('%M'))
         while (current_minute != 0):
-            logging.info(f"Time remaining until next execution {60-current_minute} minute(s)...")
+            logging.info(
+                f"Time remaining until next execution {60-current_minute} minute(s)...")
             time.sleep(60)
             current_minute = int(time.strftime('%M'))
 
         logging.info("Let's do 1 more execution!")
         runner.execute(csp_filter)
 
-        
-        
-        
 
 else:
     logging.info("Running only once.")
