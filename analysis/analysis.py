@@ -65,10 +65,13 @@ class Analysis:
     
     def pricing_analysis(self):
         pricing_scenario = request.args.get('scenario', None)
-        if pricing_scenario is not None:
-            return self.pricing.get_diagram(pricing_scenario)
-        else:
+        if pricing_scenario == 'crossing':
             return self.pricing.get_crossing_diagram()
+        elif pricing_scenario == 'pricing_factorial_60000':
+            return self.pricing.get_pricing_based_on_factorial_60000_execution_time()
+        else:
+            return self.pricing.get_diagram(pricing_scenario)
+            
 
 
 @app.route("/")
