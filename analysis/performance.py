@@ -26,19 +26,23 @@ class Performance:
             elif app == 'factorial':
                 for cpu, mem in self.cpu_mem_comb:
                     for factorial_param in self.factorials:
-                        html = html + \
-                            f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app={app}&cpu={cpu}&memory={mem}&factorial={factorial_param}">Performance Factorial {factorial_param} - {cpu} CPU & {mem} Memory</a></li>'
+                        html += f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app={app}&cpu={cpu}&memory={mem}&factorial={factorial_param}">Performance Factorial {factorial_param} - {cpu} CPU & {mem} Memory</a></li>'
+                    html += f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app={app}&cpu={cpu}&memory={mem}&all_in_one=1">All In One - {cpu} CPU & {mem} Memory</a></li>'
+                    html += f'<li><a href="/{self.FUNCTION_NAME}?report=performance&app={app}&cpu={cpu}&memory={mem}&all_in_one=1&avg_only=1">All In One AVG Only - {cpu} CPU & {mem} Memory</a></li>'
 
+                    
+            
             html = html + '</ul>'
         
         return html
 
-    def get_diagram(self, type_of_app, cpu, memory, factorial):
+    def get_diagram(self, type_of_app, cpu, memory, factorial, avg_only=False):
         query = f"""SELECT
                     csp,
                     min(app_execution_time_min) as  app_execution_time_min,
                     avg(app_execution_time_avg) as  app_execution_time_avg,
-                    max(app_execution_time_max) as  app_execution_time_max
+                    max(app_execution_time_max) as  app_execution_time_max,
+                    count(id) as count
                     FROM metrics
                     WHERE
                     memory = {memory} AND
@@ -56,29 +60,46 @@ class Performance:
         
         self.db_c.execute(query)
         data = self.db_c.fetchall()
-        
+        fig = Figure()
+        ax = fig.subplots()
+
         labels = []
         min_data = []
         avg_data = []
         max_data = []
+        total_items = 0
 
         for item in data:
-            labels.append(item.get('csp'))
-            min_data.append(item.get('app_execution_time_min'))
-            avg_data.append(item.get('app_execution_time_avg'))
-            max_data.append(item.get('app_execution_time_max'))
+            csp = item.get('csp')
+            if csp == 'docker':
+                
+                if not avg_only:
+                    ax.axhline(y=item.get('app_execution_time_min'),xmin=0, label="Docker Min", linestyle=':',  color='#000000')
+
+                ax.axhline(y=item.get('app_execution_time_avg'),xmin=0, label="Docker Avg", linestyle='--', color='#000000')
+                if not avg_only:
+                    ax.axhline(y=item.get('app_execution_time_max'),xmin=0, label="Docker Max", linestyle='-',  color='#000000')
+            else:
+                labels.append(csp)
+                min_data.append(item.get('app_execution_time_min'))
+                avg_data.append(item.get('app_execution_time_avg'))
+                max_data.append(item.get('app_execution_time_max'))
+                total_items += int(item.get('count'))
 
         x = np.arange(len(labels))  # the label locations
-        width = 0.20  # the width of the bars
-        fig = Figure()
-        ax = fig.subplots()
-        rect_min = ax.bar(x - width, min_data, width, label='Min')
+        width = 0.20 if not avg_only else 0.50  # the width of the bars
+
+        if not avg_only:
+            rect_min = ax.bar(x - width, min_data, width, label='Min')
+        
         rect_avg = ax.bar(x, avg_data, width, label='Avg')
-        rect_max = ax.bar(x + width, max_data, width, label='Max')
+        
+        if not avg_only:
+            rect_max = ax.bar(x + width, max_data, width, label='Max')
 
         # # Add some text for labels, title and custom x-axis tick labels, etc.
         ax.set_ylabel('millisecond (ms)')
-        ax.set_title(f'Mininimum, Average and Maximum response times for {type_of_app} {factorial}')
+        ax.set_title(f'Min, Avg and Max application response times for {type_of_app} {factorial if factorial is not None else "world"}.\n {cpu} CPU and {memory}GB of Memory. ({total_items} tests executed)')
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
         ax.legend()
@@ -88,3 +109,4 @@ class Performance:
         img_base64 = base64.b64encode(buf.getbuffer()).decode("ascii")
         return f"<img src='data:image/png;base64,{img_base64}'/>"
 
+    

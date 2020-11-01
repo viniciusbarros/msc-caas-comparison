@@ -60,8 +60,26 @@ class Analysis:
         memory = request.args.get('memory', None)
         factorial = request.args.get('factorial', None)
         type_of_app = request.args.get('app', None)
+        avg_only = bool(int(request.args.get('avg_only', False)))
+        all_in_one = bool(int(request.args.get('all_in_one', False)))
 
-        return self.performance.get_diagram(type_of_app, cpu, memory, factorial)
+        if all_in_one:
+            diagrams = [
+                self.performance.get_diagram(type_of_app, cpu, memory, '10', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '1000', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '10000', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '32000', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '43000', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '50000', avg_only),
+                self.performance.get_diagram(type_of_app, cpu, memory, '60000', avg_only),
+            ]
+            html = ''
+            for item in diagrams:
+                html += item
+
+            return html
+
+        return self.performance.get_diagram(type_of_app, cpu, memory, factorial, avg_only)
     
     def pricing_analysis(self):
         pricing_scenario = request.args.get('scenario', None)
