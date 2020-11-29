@@ -3,7 +3,7 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/viniciusbarros/msc-performance-web-app)
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/viniciusbarros/msc-performance-web-app)
 
-The goal of this project is to help organising the development of the MSc research that compares "Container as a Service" solutions available in public Cloud Service Providers (CSP).
+The goal of this project is to help organising the development of the MSc research that compares serverless CaaS (Container as a Service) solutions available in public Cloud Service Providers (CSP).
 
 This project will also host the source code that will be used to perform the tests and anylises.
 
@@ -13,10 +13,13 @@ The goal is to have this repository publicly available once the project is finis
 A Docker application was created to be deployed and utilised in each of the studied CSP.
 It consists of a Flask (Python3 web app), served via a Waitress webserver, which is recommended by [Flask](https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/#run-with-a-production-server)
 
-The application is in this repository, but the Docker image built from the Dockerfil is being hosted in Dockerhub: [viniciusbarros/msc-performance-web-app](https://hub.docker.com/repository/registry-1.docker.io/viniciusbarros/msc-performance-web-app)
+The application is in this repository, but the Docker image built from the Dockerfile is being hosted in Dockerhub: [viniciusbarros/msc-performance-web-app](https://hub.docker.com/repository/registry-1.docker.io/viniciusbarros/msc-performance-web-app)
 
-There are two main functionalities:
-### Hello World
+There are two main functionalities in the application, which are exposed by two different endpoints: **Hello World** and **High CPU**.
+
+![Image describing containerised application](static/containerised-application-diagram.png)
+
+### Hello World Endpoint
 A GET HTTP request to **/** in the application, you'll answer:
 
 ```json
@@ -26,7 +29,7 @@ A GET HTTP request to **/** in the application, you'll answer:
 }
 ```
 
-### High CPU (Factorial)
+### High CPU (Factorial) Endpoint
 When you access the path **/cpu/factorial/<NUMBER>**, the application will calculate the factorial for the given number and return:
 
 ```json
@@ -39,17 +42,11 @@ When you access the path **/cpu/factorial/<NUMBER>**, the application will calcu
 ```
 
 
-## Backlog
-To help organising the development of the project, the study was divided into GitHub projects and tasks.
+## Execution of Tests
+Tests can be executed in parallel. An example of these executions can be found in the image below.
 
-* [Initial Extra Info](https://github.com/viniciusbarros/msc-caas-comparison/projects/1)
-* [Truly Serverless?](https://github.com/viniciusbarros/msc-caas-comparison/projects/2)
-* [Which Solution is cheaper?](https://github.com/viniciusbarros/msc-caas-comparison/projects/3)
-* [Which Solution performs better?](https://github.com/viniciusbarros/msc-caas-comparison/projects/4)
-* [Are there any cold starts?](https://github.com/viniciusbarros/msc-caas-comparison/projects/5)
-* [How well do they scale?](https://github.com/viniciusbarros/msc-caas-comparison/projects/6)
-* [Which Solution to recommend?](https://github.com/viniciusbarros/msc-caas-comparison/projects/7)
+![Image describe execution of tests in parallel](static/parallel-execution.png)
 
-## Overleaf 
-The project is being edited in Overleaf:
-https://www.overleaf.com/project/5ed2258d6ab9030001ece10f
+
+## Results
+A dump of the database with the collected metrics for the initial study can be found in [static/dump.sql.zip](./static/dump.sql.zip)
