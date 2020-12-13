@@ -95,7 +95,7 @@ class Pricing:
         ]
 
     def get_reports_links(self):
-        html = "<h2>Pricing</h2> <ul>"
+        html = "<h3>Pricing</h3> <ul>"
         for ind, scenario in enumerate(self.SCENARIOS):
             html += f"<li><a href='/{self.FUNCTION_NAME}?report=pricing&scenario={ind}'>Scenario [{ind}]: {scenario['cpu']} CPU, {scenario['memory']} Memory, {scenario['hours_per_day']} Hours/Day </a></li>"
 

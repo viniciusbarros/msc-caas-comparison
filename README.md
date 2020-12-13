@@ -45,8 +45,16 @@ When you access the path **/cpu/factorial/<NUMBER>**, the application will calcu
 ## Execution of Tests
 Tests can be executed in parallel. An example of these executions can be found in the image below.
 
-![Image describe execution of tests in parallel](static/parallel-execution.png)
+![Image describing execution of tests in parallel](static/parallel-execution.png)
 
 
 ## Results
 A dump of the database with the collected metrics for the initial study can be found in [static/dump.sql.zip](./static/dump.sql.zip)
+
+### Real time information
+Some real time information extracted directly from the database displays some insights about the tests.
+Plots can be generated on demand using the application inside the folder /analysis.
+
+Example of the Analysis Dashboard:
+
+![Image showing example of dashboard with some results](static/example-dashboard.png)

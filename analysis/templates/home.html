@@ -1,0 +1,74 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Compressed CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.6.3/dist/css/foundation.min.css"
+        integrity="sha256-ogmFxjqiTMnZhxCqVmcqTvjfe1Y/ec4WaRj/aQPvn+I=" crossorigin="anonymous">
+
+
+    <title>Serverless CaaS Comparisons Results</title>
+</head>
+
+<body>
+    <div class="grid-container">
+        <div class="grid-x grid-margin-x">
+            <div class="cell small-12">
+                <h1 class="text-center">Serverless CaaS Comparisons Results</h1>
+                <div class="text-center">
+                    <span class="label primary" style="font-size: 25px; padding: 12px">{{summary.total.tests_executed}} Tests Executed</span>
+                    <span class="label secondary" style="font-size: 25px; padding: 12px">Duration: {{summary.total.duration_days}} days</span>
+                    <span class="label success" style="font-size: 25px; padding: 12px">CaaS tested: {{summary.total.caas_tested}}</span>
+                    <span class="label warning" style="font-size: 25px; padding: 12px">HTTP Requests: {{summary.total.total_request | int}}</span>
+                </div>
+                <br/>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CSP/CaaS</th>
+                            <th>Tests</th>
+                            <th>HTTP Requests</th>
+                            <th>Uploaded (GB)</th>
+                            <th>Downloaded (GB)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for csp_name in summary.csp %}
+                        <tr>
+                            <td>{{ csp_name }}</td>
+                            <td>{{ summary.csp[csp_name]['tests_executed'] }}</td>
+                            <td>{{ summary.csp[csp_name]['total_request'] | int }}</td>
+                            <td>{{ summary.csp[csp_name]['uploaded_gb'] }}</td>
+                            <td>{{ summary.csp[csp_name]['downloaded_gb'] }}</td>
+                        </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr />
+        <div class="grid-x grid-margin-x">
+            <div class="cell small-12">
+                <h2>Reports on demand</h2>
+                {{performance_links | safe}}
+                {{pricing_links | safe}}
+                {{weekend_vs_weekdays_links | safe}}
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/what-input/4.2.0/what-input.min.js"
+        integrity="sha256-7wGy9IEPmo9Jk/I86siWbZFPeclfjFitAAfmvxBUc7k=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.6.3/dist/js/foundation.min.js"
+        integrity="sha256-pRF3zifJRA9jXGv++b06qwtSqX1byFQOLjqa2PTEb2o=" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).foundation();
+    </script>
+</body>
+
+</html>

@@ -17,7 +17,7 @@ class Performance:
     def get_reports_links(self):
         html = ""
         for app in self.apps:
-            html = html + f"<h2>App {app}</h2> <ul>"
+            html = html + f"<h3>App {app}</h3> <ul>"
 
             if app == 'hello-world':
                 for cpu, mem in self.cpu_mem_comb:
